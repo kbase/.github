@@ -30,5 +30,22 @@ These scripts allow KBase developers to:
 
 
 ---
-**|| Next: [New Repository](./guide/new-repository.md) ||**
 
+## FAQ / TLDR
+
+#### Q: How do I get docker images building in my repo?
+A: Add the "Build Production Release Image" and "Pull Request Build, Tag, & Push" workflows from the [Github Actions Tab](https://github.com/kbase/.github/actions/new). Then [Enable `development` and `main`/`master` branch rules](./guide/enable-branch-rules.md)
+
+#### Q: How do I deploy an docker image on ci?
+A: Create a PR against "develop". Once the PR is merged into develop, you can deploy it on CI
+
+#### Q: How do I deploy an docker image on the production environments?
+A: Create a PR from develop to main, along with release notes and change logs. Upon merging to main, draft a release using semantic versioning
+and update the release notes in github. Then ask in #devops to deploy the latest tag.
+
+#### Q: How do I deploy an docker image on ci from a feature branch, without merging it in yet?
+A: Either use the manual workflow or edit XXX
+
+
+---
+**|| Next: [New Repository](./guide/new-repository.md) ||**
