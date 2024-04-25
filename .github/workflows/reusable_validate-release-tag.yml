@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Validate that release tag as a proper semantic version
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const releaseTag = '${{ inputs.release_tag }}';
