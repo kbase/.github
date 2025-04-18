@@ -54,16 +54,18 @@ jobs:
                       }).join(',');
 
             - name: Build and push
-              uses: docker/build-push-action@v3
+              uses: docker/build-push-action@v5
               with:
-                  context: .
-                  file: ./Dockerfile
-                  pull: true
-                  push: true
-                  platforms: "${{ inputs.platforms }}"
-                  build-args: |
-                      BUILD_DATE=${{ steps.date.outputs.date }}
-                      VCS_REF=${{ github.sha }}
-                      BRANCH='${{ github.ref }}'
-                      TAG='${{ github.ref }}'
-                  tags: "${{ steps.tags.outputs.result }}"
+                context: .
+                file: ./Dockerfile
+                pull: true
+                push: true
+                platforms: "${{ inputs.platforms }}"
+                build-args: |
+                  BUILD_DATE=${{ steps.date.outputs.date }}
+                  VCS_REF=${{ github.sha }}
+                  BRANCH='${{ github.ref }}'
+                  TAG='${{ github.ref }}'
+                tags: "${{ steps.tags.outputs.result }}"
+                sbom: true
+
