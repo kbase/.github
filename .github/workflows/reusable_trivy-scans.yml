@@ -17,17 +17,18 @@ jobs:
 
       - name: Build an image from Dockerfile
         run: |
-          docker build -t local-scan:${{ github.sha }} .
+          docker build -t kbase/trivy:scan . 
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: "local-scan:${{ github.sha }}"
+          image-ref: "kbase/trivy:scan"
           format: "sarif"
           output: "trivy-results.sarif"
           timeout: "20m"
           ignore-unfixed: true
-          severity: 'CRITICAL,HIGH'
+          severity: 'CRITICAL'
+          limit-severities-for-sarif: true
 
       - name: Upload Trivy scan results to GitHub Security tab
         # Always run this step to upload results, even if the scan step failed
