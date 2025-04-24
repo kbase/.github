@@ -1,0 +1,5 @@
+{
+    "name": "Run Trivy Scans",
+    "description": "Run Trivy Scans",
+    "iconName": "kbase-bot"
+}
