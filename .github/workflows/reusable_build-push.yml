@@ -54,7 +54,7 @@ jobs:
                       }).join(',');
 
             - name: Build and push
-              uses: docker/build-push-action@v3
+              uses: docker/build-push-action@v6
               with:
                   context: .
                   file: ./Dockerfile
@@ -67,3 +67,4 @@ jobs:
                       BRANCH='${{ github.ref }}'
                       TAG='${{ github.ref }}'
                   tags: "${{ steps.tags.outputs.result }}"
+                  sbom: true
