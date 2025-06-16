@@ -38,3 +38,4 @@ jobs:
           sarif_file: "trivy-results.sarif"
           category: 'trivy-docker-scan'
           ref: 'refs/heads/${{ github.base_ref }}'
+          sha: '${{ github.event.pull_request.head.sha }}'
