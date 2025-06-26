@@ -27,8 +27,8 @@ jobs:
           output: "trivy-results.sarif"
           timeout: "20m"
           ignore-unfixed: true
-          # severity: 'HIGH,CRITICAL'
-          # limit-severities-for-sarif: true
+          severity: 'HIGH,CRITICAL'
+          limit-severities-for-sarif: true
 
 
       # - name: Upload Trivy scan results to GitHub Security tab for PR 
