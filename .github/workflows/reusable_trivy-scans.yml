@@ -1,51 +1,51 @@
 ---
 name: Run Trivy Scans
+
 on:
-    workflow_call:
+  workflow_call:
+
 jobs:
-    build-image:
-        runs-on: ubuntu-latest
-        steps:
-            - name: Check out GitHub Repo
-              uses: actions/checkout@v4
+  build-and-scan-image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
 
-            - name: Build an image from Dockerfile
-              run: |
-                  git config --global --add safe.directory $GITHUB_WORKSPACE;
-                  docker build -t trivy-test .
+    steps:
+      - name: Check out GitHub Repo
+        uses: actions/checkout@v4
 
-            - name: Run Trivy vulnerability scanner, output as table
-              uses: aquasecurity/trivy-action@master
-              with:
-                  image-ref: "trivy-test"
-                  format: "table"
-                  output: "trivy-results.tbl"
-                  timeout: "20m0s"
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -t kbase/trivy:scan . 
 
-            - name: Check for log4j CVEs
-              run: |
-                  set -e
-                  for cve in CVE-2021-4104 CVE-2021-44228 CVE-2021-45046 CVE-2022-22965 ; do
-                  	if grep -c $cve trivy-results.tbl > 0;
-                  	  then
-                  	    echo "Found log4j error: $cve"
-                  	    exit 2
-                  	fi
-                  done
-                  # If above doesn't find errors, return pass message:
-                  echo "Did not find core log4j errors, yay!"
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: "kbase/trivy:scan"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          timeout: "20m"
+          ignore-unfixed: true
+          # severity: 'HIGH,CRITICAL'
+          # limit-severities-for-sarif: true
 
-            - name: Rerun Trivy vulnerability scanner for GitHub security
-              uses: aquasecurity/trivy-action@master
-              if: always()
-              with:
-                  image-ref: "trivy-test"
-                  format: "sarif"
-                  output: "trivy-results.sarif"
-                  timeout: "20m0s"
-                  ignore-unfixed: true
 
-            - name: Upload Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v2
-              with:
-                  sarif_file: "trivy-results.sarif"
+      # - name: Upload Trivy scan results to GitHub Security tab for PR 
+      #   # Always run this step to upload results, even if the scan step failed
+      #   if: always()
+      #   uses: github/codeql-action/upload-sarif@v3
+      #   with:
+      #     sarif_file: "trivy-results.sarif"
+      #     category: 'trivy-docker-scan'
+
+        
+      - name: Upload Trivy scan results to GitHub Security tab
+        # Always run this step to upload results, even if the scan step failed
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-results.sarif"
+          category: 'trivy-docker-scan'
+          ref: 'refs/heads/${{ github.base_ref }}'
+          sha: '${{ github.event.pull_request.head.sha }}'
