@@ -42,12 +42,13 @@ jobs:
 
         
       - name: Upload Trivy scan results to GitHub Security tab for BASE_REF
-        # Always run this step to upload results, even if the scan step failed
-        if: always()
+        # Always run this step to upload results, even if the scan step failed,
+        # BUT ONLY if it's a pull_request event or a workflow_call from a pull_request.
+        if: always() && (github.event_name == 'pull_request' || (github.event_name == 'workflow_call' && github.event.pull_request))
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "trivy-results.sarif"
-          category: 'trivy-docker-scan-baseref'
+          category: 'trivy-docker-scan-base-ref'
           ref: 'refs/heads/${{ github.base_ref }}'
           sha: '${{ github.event.pull_request.head.sha }}'
 
