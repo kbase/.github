@@ -38,7 +38,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "trivy-results.sarif"
-          category: 'trivy-docker-scan'
+          category: 'trivy-docker-scan-pr'
 
         
       - name: Upload Trivy scan results to GitHub Security tab for BASE_REF
@@ -47,7 +47,7 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "trivy-results.sarif"
-          category: 'trivy-docker-scan'
+          category: 'trivy-docker-scan-baseref'
           ref: 'refs/heads/${{ github.base_ref }}'
           sha: '${{ github.event.pull_request.head.sha }}'
 
