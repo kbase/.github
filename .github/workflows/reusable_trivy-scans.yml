@@ -11,7 +11,7 @@ jobs:
       contents: read
       security-events: write
 
-        steps:
+      steps:
       - name: Check out GitHub Repo
         uses: actions/checkout@v4
 
