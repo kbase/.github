@@ -11,7 +11,7 @@ jobs:
       contents: read
       security-events: write
 
-    steps:
+        steps:
       - name: Check out GitHub Repo
         uses: actions/checkout@v4
 
@@ -42,9 +42,11 @@ jobs:
 
         
       - name: Upload Trivy scan results to GitHub Security tab for BASE_REF
-        # Always run this step to upload results, even if the scan step failed,
-        # BUT ONLY if it's a pull_request event or a workflow_call from a pull_request.
-        if: always() && (github.event_name == 'pull_request' || (github.event_name == 'workflow_call' && github.event.pull_request))
+        # This step will now only run if 'always()' is true, AND
+        # if 'github.base_ref' has a value, AND
+        # if 'github.event.pull_request.head.sha' has a value.
+        # This will prevent the warning when those values are not present.
+        if: always() && github.base_ref && github.event.pull_request.head.sha
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: "trivy-results.sarif"
@@ -69,5 +71,7 @@ jobs:
           if [ "$FOUND_CRITICAL" = true ]; then
             echo "Workflow failed due to specific critical CVEs."
             exit 1
+          fi
+        if: always() # Ensures this check runs even if previous steps had warnings/non-fatal issues
           fi
         if: always() # Ensures this check runs even if previous steps had warnings/non-fatal issues
