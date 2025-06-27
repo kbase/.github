@@ -73,5 +73,3 @@ jobs:
             exit 1
           fi
         if: always() # Ensures this check runs even if previous steps had warnings/non-fatal issues
-          fi
-        if: always() # Ensures this check runs even if previous steps had warnings/non-fatal issues
