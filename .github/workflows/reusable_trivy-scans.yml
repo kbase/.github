@@ -29,18 +29,19 @@ jobs:
           ignore-unfixed: true
           severity: 'HIGH,CRITICAL'
           limit-severities-for-sarif: true
+          exit-code: '1' # Fail Step if CVE of specified severity is detected 
 
 
-      # - name: Upload Trivy scan results to GitHub Security tab for PR 
-      #   # Always run this step to upload results, even if the scan step failed
-      #   if: always()
-      #   uses: github/codeql-action/upload-sarif@v3
-      #   with:
-      #     sarif_file: "trivy-results.sarif"
-      #     category: 'trivy-docker-scan'
+      - name: Upload Trivy scan results to GitHub Security tab for PR 
+        # Always run this step to upload results, even if the scan step failed
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "trivy-results.sarif"
+          category: 'trivy-docker-scan'
 
         
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: Upload Trivy scan results to GitHub Security tab for BASE_REF
         # Always run this step to upload results, even if the scan step failed
         if: always()
         uses: github/codeql-action/upload-sarif@v3
@@ -49,3 +50,23 @@ jobs:
           category: 'trivy-docker-scan'
           ref: 'refs/heads/${{ github.base_ref }}'
           sha: '${{ github.event.pull_request.head.sha }}'
+
+
+      - name: Fail on Specific Critical CVEs
+        run: |
+          set -e # Fail the script if any command exits non-zero
+          REQUIRED_CVES="CVE-2021-4104 CVE-2021-44228 CVE-2021-45046 CVE-2022-22965"
+          FOUND_CRITICAL=false
+
+          for CVE_ID in $REQUIRED_CVES; do
+            if grep -q "\"id\": \"${CVE_ID}\"" trivy-results.sarif; then
+              echo "::error file=trivy-results.sarif::CRITICAL CVE detected: ${CVE_ID}"
+              FOUND_CRITICAL=true
+            fi
+          done
+
+          if [ "$FOUND_CRITICAL" = true ]; then
+            echo "Workflow failed due to specific critical CVEs."
+            exit 1
+          fi
+        if: always() # Ensures this check runs even if previous steps had warnings/non-fatal issues
