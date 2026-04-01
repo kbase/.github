@@ -19,6 +19,9 @@ on:
 jobs:
     build-push-image:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
         steps:
             - name: Check out GitHub Repo
               uses: actions/checkout@v4
@@ -37,8 +40,8 @@ jobs:
               uses: docker/login-action@v3
               with:
                   registry: ghcr.io
-                  username: "${{ github.repository_owner }}"
-                  password: "${{ secrets.GITHUB_TOKEN  }}"
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Create github action tags from image tags
               id: tags
